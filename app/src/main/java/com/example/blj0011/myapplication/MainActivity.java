@@ -1,6 +1,7 @@
 package com.example.blj0011.myapplication;
 
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,43 +18,45 @@ public class MainActivity extends AppCompatActivity {
 
     float mLastTouchX, mLastTouchY;
 
-    RotateAnimation anim;
+    Deck deck;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        deck = new Deck(this);
 
 
         btnChangeImage = findViewById(R.id.btnChangeImage);
-        ivChangeImage = findViewById(R.id.ivChangeImage);
-
-        ivChangeImage.setImageResource(R.drawable.ic_home_black_24dp);
+        deck.getNextCard().getImageView();
+//        ivChangeImage = findViewById(R.id.ivChangeImage);
+//
+//        ivChangeImage.setImageResource();
         //anim = new RotateAnimation(0f, 350f, ivChangeImage.getX() + (ivChangeImage.getLayoutParams().width / 2), ivChangeImage.getY() + (ivChangeImage.getLayoutParams().height / 2));
 
-        btnChangeImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(ivChangeImage.getDrawable().getConstantState() == getResources().getDrawable(R.drawable.ic_home_black_24dp).getConstantState())
-                {
-                    ivChangeImage.setImageResource(R.drawable.card_spades_a);
-
-                    anim = new RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                    anim.setInterpolator(new LinearInterpolator());
-                    anim.setRepeatCount(Animation.INFINITE);
-                    anim.setDuration(700);
-
-                    ivChangeImage.startAnimation(anim);
-                }
-                else
-                {
-                    ivChangeImage.setImageResource(R.drawable.ic_home_black_24dp);
-                    ivChangeImage.setAnimation(null);
-                }
-
-            }
-        });
+//        btnChangeImage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if(ivChangeImage.getDrawable().getConstantState() == getResources().getDrawable(R.drawable.ic_home_black_24dp).getConstantState())
+//                {
+//                    ivChangeImage.setImageResource(R.drawable.);
+//
+//                    anim = new RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+//                    anim.setInterpolator(new LinearInterpolator());
+//                    anim.setRepeatCount(Animation.INFINITE);
+//                    anim.setDuration(700);
+//
+//                    ivChangeImage.startAnimation(anim);
+//                }
+//                else
+//                {
+//                    ivChangeImage.setImageResource(R.drawable.ic_home_black_24dp);
+//                    ivChangeImage.setAnimation(null);
+//                }
+//
+//            }
+//        });
 
 
        ivChangeImage.setOnTouchListener(new View.OnTouchListener() {
