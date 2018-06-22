@@ -39,8 +39,9 @@ public class Deck {
 
         for(int i = 0; i < cardIds.length; i++)
         {
-            String suit = suits[i / 12];
-            String faceValue = faceValues[i % 12];
+            System.out.println("suits: " + i/13 + "  face: " + i % 13);
+            String suit = suits[i / 13];
+            String faceValue = faceValues[i % 13];
             cards.add(new Card(suit, faceValue, cardBackIds[0], cardIds[i], context));
         }
     }

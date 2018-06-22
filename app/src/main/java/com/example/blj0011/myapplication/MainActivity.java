@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
 
     Button btnChangeImage;
     ImageView ivChangeImage;
-
+    ConstraintLayout container;
     float mLastTouchX, mLastTouchY;
 
     Deck deck;
@@ -25,11 +25,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        container = findViewById(R.id.container);
         deck = new Deck(this);
+        Card card = deck.getNextCard();
+        container.addView(card.getImageView());
+        card.showFrontImage();
+
+
+
 
 
         btnChangeImage = findViewById(R.id.btnChangeImage);
-        deck.getNextCard().getImageView();
+        //deck.getNextCard().getImageView();
 //        ivChangeImage = findViewById(R.id.ivChangeImage);
 //
 //        ivChangeImage.setImageResource();
@@ -59,34 +66,34 @@ public class MainActivity extends AppCompatActivity {
 //        });
 
 
-       ivChangeImage.setOnTouchListener(new View.OnTouchListener() {
-           @Override
-           public boolean onTouch(View v, MotionEvent event) {
-               switch (event.getAction())
-               {
-                   case MotionEvent.ACTION_DOWN:
-                       mLastTouchX = event.getRawX();
-                       mLastTouchY = event.getRawY();
-                       break;
-                   case MotionEvent.ACTION_MOVE:
-                       final float x = event.getRawX();
-                       final float y = event.getRawY();
-                       final float dx = x - mLastTouchX;
-                       final float dy = y - mLastTouchY;
-
-                       ivChangeImage.setX(ivChangeImage.getX() + dx);
-                       ivChangeImage.setY(ivChangeImage.getY() + dy);
-
-
-                       mLastTouchX = x;
-                       mLastTouchY = y;
-                       break;
-               }
-
-               return true;
-           }
-
-       });
+//       ivChangeImage.setOnTouchListener(new View.OnTouchListener() {
+//           @Override
+//           public boolean onTouch(View v, MotionEvent event) {
+//               switch (event.getAction())
+//               {
+//                   case MotionEvent.ACTION_DOWN:
+//                       mLastTouchX = event.getRawX();
+//                       mLastTouchY = event.getRawY();
+//                       break;
+//                   case MotionEvent.ACTION_MOVE:
+//                       final float x = event.getRawX();
+//                       final float y = event.getRawY();
+//                       final float dx = x - mLastTouchX;
+//                       final float dy = y - mLastTouchY;
+//
+//                       ivChangeImage.setX(ivChangeImage.getX() + dx);
+//                       ivChangeImage.setY(ivChangeImage.getY() + dy);
+//
+//
+//                       mLastTouchX = x;
+//                       mLastTouchY = y;
+//                       break;
+//               }
+//
+//               return true;
+//           }
+//
+//       });
 
     }
 
