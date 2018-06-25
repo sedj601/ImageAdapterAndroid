@@ -3,6 +3,7 @@ package com.example.blj0011.myapplication;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
+import android.annotation.SuppressLint;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
@@ -54,30 +55,30 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleButtonHandlers()
     {
-        btnDoubleDown.setOnTouchListener(new View.OnTouchListener() {
+        btnDoubleDown.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
+            public void onClick(View v) {
+
             }
         });
 
-        btnSplit.setOnTouchListener(new View.OnTouchListener() {
+        btnSplit.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
+            public void onClick(View v) {
+
             }
         });
 
-        btnHit.setOnTouchListener(new View.OnTouchListener() {
+        btnHit.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
+            public void onClick(View v) {
+
             }
         });
 
-        btnStand.setOnTouchListener(new View.OnTouchListener() {
+        btnStand.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
+            public void onClick(View v) {
                 dealer = new Hand(deck.getDealerHand());
                 dealer.getHand().get(0).showFrontImage();
 
@@ -93,17 +94,13 @@ public class MainActivity extends AppCompatActivity {
                     finalAnimatorSet.setDuration(500);
                     finalAnimatorSet.start();
                     finalAnimatorSet.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        super.onAnimationEnd(animation);
-                        dealer.getHand().get(dealer.getHand().size() - 1).showFrontImage();
-                    }
-                });
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            dealer.getHand().get(dealer.getHand().size() - 1).showFrontImage();
+                        }
+                    });
                 }
-//
-//                finalAnimatorSet.playSequentially(animatorSet);
-//                finalAnimatorSet.setDuration(500);
-//                finalAnimatorSet.start();
 
                 if(dealer.getValueOfCard() >= 17 && dealer.getValueOfCard() <= 21)
                 {
@@ -119,10 +116,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.i("Results", "Draw!");
                     }
                 }
-                return true;
             }
         });
-
     }
-
 }
