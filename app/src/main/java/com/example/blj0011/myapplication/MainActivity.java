@@ -1,8 +1,14 @@
 package com.example.blj0011.myapplication;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -11,89 +17,111 @@ import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
-    Button btnChangeImage;
-    ImageView ivChangeImage;
+    Button btnDoubleDown, btnSplit, btnHit, btnStand;
     ConstraintLayout container;
-    float mLastTouchX, mLastTouchY;
 
     Deck deck;
-
+    Hand dealer, player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         container = findViewById(R.id.container);
+        btnDoubleDown = findViewById(R.id.btnDoubleDown);
+        btnSplit = findViewById(R.id.btnSplit);
+        btnHit = findViewById(R.id.btnHit);
+        btnStand = findViewById(R.id.btnStand);
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
         deck = new Deck(this);
-        Card card = deck.getNextCard();
-        container.addView(card.getImageView());
-        card.showFrontImage();
+        deck.setLocation(container, (size.x / 2), (size.y / 2 - 200));
+        deck.shuffle();
+        deck.dealBlackJack();
+
+        handleButtonHandlers();
 
 
 
+    }
 
+    private void handleButtonHandlers()
+    {
+        btnDoubleDown.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
 
-        btnChangeImage = findViewById(R.id.btnChangeImage);
-        //deck.getNextCard().getImageView();
-//        ivChangeImage = findViewById(R.id.ivChangeImage);
-//
-//        ivChangeImage.setImageResource();
-        //anim = new RotateAnimation(0f, 350f, ivChangeImage.getX() + (ivChangeImage.getLayoutParams().width / 2), ivChangeImage.getY() + (ivChangeImage.getLayoutParams().height / 2));
+        btnSplit.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
 
-//        btnChangeImage.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(ivChangeImage.getDrawable().getConstantState() == getResources().getDrawable(R.drawable.ic_home_black_24dp).getConstantState())
-//                {
-//                    ivChangeImage.setImageResource(R.drawable.);
-//
-//                    anim = new RotateAnimation(0.0f, 360.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-//                    anim.setInterpolator(new LinearInterpolator());
-//                    anim.setRepeatCount(Animation.INFINITE);
-//                    anim.setDuration(700);
-//
-//                    ivChangeImage.startAnimation(anim);
-//                }
-//                else
-//                {
-//                    ivChangeImage.setImageResource(R.drawable.ic_home_black_24dp);
-//                    ivChangeImage.setAnimation(null);
-//                }
-//
-//            }
-//        });
+        btnHit.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
 
+        btnStand.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                dealer = new Hand(deck.getDealerHand());
+                dealer.getHand().get(0).showFrontImage();
 
-//       ivChangeImage.setOnTouchListener(new View.OnTouchListener() {
-//           @Override
-//           public boolean onTouch(View v, MotionEvent event) {
-//               switch (event.getAction())
-//               {
-//                   case MotionEvent.ACTION_DOWN:
-//                       mLastTouchX = event.getRawX();
-//                       mLastTouchY = event.getRawY();
-//                       break;
-//                   case MotionEvent.ACTION_MOVE:
-//                       final float x = event.getRawX();
-//                       final float y = event.getRawY();
-//                       final float dx = x - mLastTouchX;
-//                       final float dy = y - mLastTouchY;
+                player = new Hand(deck.getPlayerHand());
+
+                AnimatorSet finalAnimatorSet = new AnimatorSet();
+                while(dealer.getValueOfCard() < 17)
+                {
+                    finalAnimatorSet.play(deck.dealDealerAnotherCard(dealer));
+                    dealer = new Hand(deck.getDealerHand());
+
+                    Log.i("dealer hand", Integer.toString(dealer.getValueOfCard()));
+                    finalAnimatorSet.setDuration(500);
+                    finalAnimatorSet.start();
+                    finalAnimatorSet.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        dealer.getHand().get(dealer.getHand().size() - 1).showFrontImage();
+                    }
+                });
+                }
 //
-//                       ivChangeImage.setX(ivChangeImage.getX() + dx);
-//                       ivChangeImage.setY(ivChangeImage.getY() + dy);
-//
-//
-//                       mLastTouchX = x;
-//                       mLastTouchY = y;
-//                       break;
-//               }
-//
-//               return true;
-//           }
-//
-//       });
+//                finalAnimatorSet.playSequentially(animatorSet);
+//                finalAnimatorSet.setDuration(500);
+//                finalAnimatorSet.start();
+
+                if(dealer.getValueOfCard() >= 17 && dealer.getValueOfCard() <= 21)
+                {
+                    if(dealer.getValueOfCard() > player.getValueOfCard())
+                    {
+                        Log.i("Results", "Dealer Win!");
+                    }
+                    else if(dealer.getValueOfCard() > player.getValueOfCard())
+                    {
+                        Log.i("Results", "You Won!");
+                    }
+                    else {
+                        Log.i("Results", "Draw!");
+                    }
+                }
+                return true;
+            }
+        });
 
     }
 
