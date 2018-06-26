@@ -45,13 +45,10 @@ public class MainActivity extends AppCompatActivity {
         display.getSize(size);
         deck = new Deck(this);
         deck.setLocation(container, (size.x / 2), (size.y / 2 - 200));
-        //deck.shuffle();
+        deck.shuffle();
         deck.dealBlackJack();
 
         handleButtonHandlers();
-
-
-
     }
 
     private void handleButtonHandlers() {

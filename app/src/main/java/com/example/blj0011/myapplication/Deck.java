@@ -44,7 +44,6 @@ public class Deck {
     int dealerCardXCounter = 1;
 
     List<Card> cards;
-    //List<Card> discard;
     List<Card> dealerHand;
     List<Card> playerHand;
 
@@ -53,7 +52,6 @@ public class Deck {
     public Deck(Context context)
     {
         cards = new ArrayList();
-        //discard = new ArrayList();
         dealerHand = new ArrayList();
         playerHand = new ArrayList();
 
@@ -65,15 +63,6 @@ public class Deck {
             cards.add(new Card(suit, faceValue, cardBackIds[0], cardIds[i], context));
         }
     }
-
-//    public Card getNextCard()
-//    {
-//        Card tempCard = cards.get(0);
-//        discard.add(cards.get(0));
-//        cards.remove(0);
-//
-//        return tempCard;
-//    }
 
     public void setLocation(ConstraintLayout layout, float x, float y)
     {
