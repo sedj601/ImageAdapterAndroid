@@ -86,12 +86,19 @@ public class Deck {
 
     public void dealBlackJack()
     {
-        Card dealerCard1 = cards.get(topCard++);
+        final Card dealerCard1 = cards.get(topCard++);
         dealerHand.add(dealerCard1);
         ObjectAnimator dealerAnimator1X = ObjectAnimator.ofFloat(dealerCard1.getImageView(), "translationX", dealerCard1.getImageView().getX() - 20);
         ObjectAnimator dealerAnimator1Y = ObjectAnimator.ofFloat(dealerCard1.getImageView(), "translationY", dealerCard1.getImageView().getY() - 400);
         AnimatorSet dealerAnimatorSet1 = new AnimatorSet();
         dealerAnimatorSet1.playTogether(dealerAnimator1X, dealerAnimator1Y);
+        dealerAnimatorSet1.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                dealerCard1.showFrontImage();
+            }
+        });
 
         final Card playerCard1 = cards.get(topCard++);
         playerHand.add(playerCard1);
@@ -114,13 +121,6 @@ public class Deck {
         ObjectAnimator dealerAnimator2Y = ObjectAnimator.ofFloat(dealerCard2.getImageView(), "translationY", dealerCard2.getImageView().getY() - 400);
         AnimatorSet dealerAnimatorSet2 = new AnimatorSet();
         dealerAnimatorSet2.playTogether(dealerAnimator2X, dealerAnimator2Y);
-        dealerAnimatorSet2.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                dealerCard2.showFrontImage();
-            }
-        });
 
         final Card playerCard2 = cards.get(topCard++);
         playerHand.add(playerCard2);
@@ -143,28 +143,48 @@ public class Deck {
         finalAnimatorSet.start();
     }
 
-    public AnimatorSet dealDealerAnotherCard(Hand dealerHand)
+    public AnimatorSet dealPlayerAnotherCard()
     {
         if(topCard < 52) {
-            Card lastDealerCard = dealerHand.getHand().get(dealerHand.getHand().size() - 1);
+            Card lastPlayerCard = playerHand.get(playerHand.size() - 1);
 
-            Card tempDealerCard = cards.get(topCard++);
-            tempDealerCard.getImageView().bringToFront();
-            discard.add(tempDealerCard);
-            dealerHand.getHand().add(tempDealerCard);
-            this.dealerHand = dealerHand.getHand();
+            Card tempPlayerCard = cards.get(topCard++);
+            tempPlayerCard.getImageView().bringToFront();
+            discard.add(tempPlayerCard);
+            playerHand.add(tempPlayerCard);
 
-            ObjectAnimator dealerAnimator1X = ObjectAnimator.ofFloat(tempDealerCard.getImageView(), "translationX", lastDealerCard.getImageView().getX() + 20);
-            ObjectAnimator dealerAnimator1Y = ObjectAnimator.ofFloat(tempDealerCard.getImageView(), "translationY", lastDealerCard.getImageView().getY());
+            ObjectAnimator dealerAnimator1X = ObjectAnimator.ofFloat(tempPlayerCard.getImageView(), "translationX", lastPlayerCard.getImageView().getX() + 40);
+            ObjectAnimator dealerAnimator1Y = ObjectAnimator.ofFloat(tempPlayerCard.getImageView(), "translationY", lastPlayerCard.getImageView().getY());
+
             AnimatorSet tempDealerAnimatorSet = new AnimatorSet();
             tempDealerAnimatorSet.playTogether(dealerAnimator1X, dealerAnimator1Y);
-            tempDealerAnimatorSet.setDuration(500);
 
             return tempDealerAnimatorSet;
         }
 
         return null;
+    }
 
+    public AnimatorSet dealDealerAnotherCard()
+    {
+        if(topCard < 52) {
+            Card lastDealerCard = dealerHand.get(dealerHand.size() - 1);
+
+            Card tempDealerCard = cards.get(topCard++);
+            tempDealerCard.getImageView().bringToFront();
+            discard.add(tempDealerCard);
+            dealerHand.add(tempDealerCard);
+
+            ObjectAnimator dealerAnimator1X = ObjectAnimator.ofFloat(tempDealerCard.getImageView(), "translationX", lastDealerCard.getImageView().getX() + 40);
+            ObjectAnimator dealerAnimator1Y = ObjectAnimator.ofFloat(tempDealerCard.getImageView(), "translationY", lastDealerCard.getImageView().getY());
+
+            AnimatorSet tempDealerAnimatorSet = new AnimatorSet();
+            tempDealerAnimatorSet.playTogether(dealerAnimator1X, dealerAnimator1Y);
+
+            return tempDealerAnimatorSet;
+        }
+
+        return null;
     }
 
     public List<Card> getDealerHand()
@@ -176,4 +196,6 @@ public class Deck {
     {
         return playerHand;
     }
+
+
 }
