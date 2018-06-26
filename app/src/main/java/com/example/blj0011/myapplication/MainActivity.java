@@ -20,6 +20,7 @@ import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -80,10 +81,14 @@ public class MainActivity extends AppCompatActivity {
                     public void onAnimationEnd(Animator animation) {
                         super.onAnimationEnd(animation);
                         deck.getPlayerHand().get(deck.getPlayerHand().size() - 1).showFrontImage();
-
+                        Log.i("Player value", Integer.toString(Hand.calculateHandValue(deck.getPlayerHand())));
                         if(Hand.calculateHandValue(deck.getPlayerHand()) > 21)
                         {
                             Log.i("You Bust!", "Dealer Wins!");
+                        }
+                        else if(Hand.calculateHandValue(deck.getPlayerHand()) ==  21)
+                        {
+                            Log.i("You got BlackJack!", "You Wins!");
                         }
                         //Enable buttons
                     }
@@ -94,49 +99,48 @@ public class MainActivity extends AppCompatActivity {
         btnStand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deck.getDealerHand().get(1).showFrontImage();
+                List<Card> tempDealerHand = deck.getDealerHand();
+                List<Card> tempPlayerHand = deck.getPlayerHand();
 
-                if (Hand.calculateHandValue(deck.getDealerHand()) == 21) {
-                    Log.i("btnStand", "BlackJack! Dealer Won!");
-                } else {
-                    if (Hand.calculateHandValue(deck.getDealerHand()) > 21) {
-                        Log.i("btnStand", "Dealer Bust! You Won!");
-                    } else if (Hand.calculateHandValue(deck.getDealerHand()) >= 17 && Hand.calculateHandValue(deck.getDealerHand()) <= 20) {
-                        if (Hand.calculateHandValue(deck.getDealerHand()) > Hand.calculateHandValue(deck.getPlayerHand())) {
-                            Log.i("Results", "Dealer Win!");
-                        } else if (Hand.calculateHandValue(deck.getDealerHand()) < Hand.calculateHandValue(deck.getPlayerHand())) {
-                            Log.i("Results", "You Won!");
-                        } else {
-                            Log.i("Results", "Draw!");
-                        }
+                tempDealerHand.get(1).showFrontImage();;
+
+                if(Hand.calculateHandValue(tempDealerHand) == 21)
+                {
+                    Log.i("Dealer BlackJack", "Dealer Won!");
+                }
+                else if(Hand.calculateHandValue(tempDealerHand) >= 17)
+                {
+                    if (Hand.calculateHandValue(tempDealerHand) > Hand.calculateHandValue(tempPlayerHand)) {
+                        Log.i("Results", "Dealer Win!");
+                    } else if (Hand.calculateHandValue(tempDealerHand) < Hand.calculateHandValue(tempPlayerHand)) {
+                        Log.i("Results", "You Win!");
                     } else {
-                        AnimatorSet finalAnimatorSet = new AnimatorSet();
-                        while (Hand.calculateHandValue(deck.getDealerHand()) < 17) {
-                            finalAnimatorSet.play(deck.dealDealerAnotherCard());
-
-                            Log.i("dealer hand", Integer.toString(Hand.calculateHandValue(deck.getDealerHand())));
-                            finalAnimatorSet.setDuration(500);
-                            finalAnimatorSet.start();
-                            finalAnimatorSet.addListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    super.onAnimationEnd(animation);
-                                    deck.getDealerHand().get(deck.getDealerHand().size() - 1).showFrontImage();
-                                }
-                            });
-                        }
-
-                        if (Hand.calculateHandValue(deck.getDealerHand()) > Hand.calculateHandValue(deck.getPlayerHand())) {
-                            Log.i("Results", "Dealer Win!");
-                        } else if (Hand.calculateHandValue(deck.getDealerHand()) < Hand.calculateHandValue(deck.getPlayerHand())) {
-                            Log.i("Results", "You Won!");
-                        } else {
-                            Log.i("Results", "Draw!");
-                        }
+                        Log.i("Results", "Draw!");
                     }
                 }
-            }
+                else
+                {
+                    List<Animator> animators = new ArrayList<>();
+                    int counterControl = deck.simulateDealingDealerAnotherCard();
+                    Log.i("simulate value", Integer.toString(counterControl));
+                    for(int i = 0; i < counterControl; i++)
+                    {
+                        animators.add(deck.dealDealerAnotherCard());
+                    }
+                    final AnimatorSet finalAnimatorSet = new AnimatorSet();
+                     finalAnimatorSet.playSequentially(animators);
+                     finalAnimatorSet.addListener(new AnimatorListenerAdapter() {
+                         @Override
+                         public void onAnimationEnd(Animator animation) {
+                             super.onAnimationEnd(animation);
 
+                             Log.i("Animation done", "done");
+                         }
+                     });
+
+                     finalAnimatorSet.start();
+                }
+            }
         });
     }
 }
