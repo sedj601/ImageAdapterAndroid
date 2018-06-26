@@ -41,7 +41,7 @@ public class Deck {
     final private String[] faceValues = {"a", "2", "3", "4", "5", "6", "7", "8", "9", "10", "j", "q", "k"};
 
     int topCard;
-    int dealerCardXCounter = 2;
+    int dealerCardXCounter = 1;
 
     List<Card> cards;
     //List<Card> discard;
@@ -177,7 +177,9 @@ public class Deck {
         {
             ++control;
             innerDealerHand.add(cards.get(innerTopCard++));
+            Log.i("SimulationDealer Values", Integer.toString(Hand.calculateHandValue(innerDealerHand)));
         }
+
 
         return  control;
     }
@@ -211,7 +213,7 @@ public class Deck {
             tempDealerCard.getImageView().bringToFront();
             dealerHand.add(tempDealerCard);
 
-            ObjectAnimator dealerAnimator1X = ObjectAnimator.ofFloat(tempDealerCard.getImageView(), "translationX", cards.get(topCard).getImageView().getX() + dealerCardXCounter++ * 40);
+            ObjectAnimator dealerAnimator1X = ObjectAnimator.ofFloat(tempDealerCard.getImageView(), "translationX", cards.get(topCard).getImageView().getX() + 20 + (dealerCardXCounter++ * 40));
             ObjectAnimator dealerAnimator1Y = ObjectAnimator.ofFloat(tempDealerCard.getImageView(), "translationY", tempDealerCard.getImageView().getY() - 400);
 
             final AnimatorSet tempDealerAnimatorSet = new AnimatorSet();

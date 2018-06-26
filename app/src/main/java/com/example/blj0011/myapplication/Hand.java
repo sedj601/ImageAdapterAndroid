@@ -68,7 +68,7 @@ public class Hand {
             }
             else if("a".equals(card.getFace()))
             {
-                if(value + 11 >= 12 && value + 11 <= 21)
+                if(value + 11 >= 11 && value + 11 <= 21)
                 {
                     value += 11;
                 }
@@ -101,7 +101,7 @@ public class Hand {
             }
             else if("a".equals(card.getFace()))
             {
-                if(value + 11 >= 12 && value + 11 <= 21)
+                if(value + 11 >= 11 && value + 11 <= 21)
                 {
                     value += 11;
                 }
