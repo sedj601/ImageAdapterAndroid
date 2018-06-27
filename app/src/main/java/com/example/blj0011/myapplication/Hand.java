@@ -1,6 +1,10 @@
 package com.example.blj0011.myapplication;
 
+import android.util.Log;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Hand {
@@ -25,29 +29,44 @@ public class Hand {
 
         int value = 0;
 
-        for(Card card : hand)
-        {
-            if(staticFaceCards.contains(card.getFace()))
-            {
-                value += 10;
-            }
-            else if(staticNumberCards.contains(card.getFace()))
-            {
-                value += Integer.parseInt(card.getFace());
-            }
-            else if("a".equals(card.getFace()))
-            {
-                if(value + 11 >= 11 && value + 11 <= 21)
+        Log.i("PLAYER VALUE card size", Integer.toString(hand.size()));
+
+
+            for (Card card : hand) {
+                Log.i("PLAYER face value", card.getFace());
+                if (staticFaceCards.contains(card.getFace())) {
+                    value += 10;
+                } else if (staticNumberCards.contains(card.getFace())) {
+                    value += Integer.parseInt(card.getFace());
+                    Log.i("PLAYER VALUE 0", Integer.toString(value));
+                }
+                if("a".equals(card.getFace()))
                 {
                     value += 11;
                 }
-                else if(value + 11 > 21)
+            }
+
+
+            if(value > 21)
+            {
+                List<String> tempString = new ArrayList<>();
+                for(Card card : hand)
                 {
-                    value += 1;
+                    tempString.add(card.getFace());
+                }
+
+                int tempFrequency = Collections.frequency(tempString, "a");
+                for(int i =0; i < tempFrequency; i++)
+                {
+                    value -= 10;
+                    if(value < 21)
+                    {
+                        break;
+                    }
                 }
             }
-        }
 
+        Log.i("PLAYER VALUE", Integer.toString(value));
         return value;
     }
 
@@ -70,17 +89,18 @@ public class Hand {
             }
             else if("a".equals(card.getFace()))
             {
-                if(value + 11 >= 11 && value + 11 <= 21)
+                int tempCal1 = value + 1;
+                int tempCal2 = value + 11;
+                if(tempCal2 > 21)
                 {
-                    value += 11;
+                    value = tempCal1;
                 }
-                else if(value + 11 > 21)
-                {
-                    value += 1;
+                else {
+                    value = tempCal2;
                 }
             }
         }
-
+        Log.i("PLAYER VALUE", Integer.toString(value));
         return value;
     }
 

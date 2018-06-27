@@ -20,14 +20,16 @@ import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btnDoubleDown, btnSplit, btnHit, btnStand;
+    Button btnDoubleDown, btnSplit, btnHit, btnStand, btnNewHand;
     ConstraintLayout container;
 
     Deck deck;
+    Point size = new Point();
     //Hand dealer, player;
 
     @Override
@@ -39,14 +41,29 @@ public class MainActivity extends AppCompatActivity {
         btnSplit = findViewById(R.id.btnSplit);
         btnHit = findViewById(R.id.btnHit);
         btnStand = findViewById(R.id.btnStand);
+        btnNewHand = findViewById(R.id.btnNewHand);
 
         Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
         display.getSize(size);
-        deck = new Deck(this);
+
+        deck = new Deck(getApplicationContext());
         deck.setLocation(container, (size.x / 2), (size.y / 2 - 200));
-        deck.shuffle();
-        deck.dealBlackJack();
+//        deck.shuffle();
+        AnimatorSet dealAnimatorSet =  deck.dealBlackJack();
+        disableAllButton(true);
+        dealAnimatorSet.start();
+        final AtomicBoolean control = new AtomicBoolean(false);
+        dealAnimatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                disableAllButton(false);
+                if(Hand.calculateHandValue(deck.getPlayerHand()) == 21)
+                {
+                    Log.i("Player got BlackJack", "You Win!");
+                }
+            }
+        });
 
         handleButtonHandlers();
     }
@@ -139,5 +156,39 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        btnNewHand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deck.clear();
+                deck = new Deck(getApplicationContext());
+                deck.setLocation(container, (size.x / 2), (size.y / 2 - 200));
+//                deck.shuffle();
+                AnimatorSet dealAnimatorSet =  deck.dealBlackJack();
+                disableAllButton(true);
+                dealAnimatorSet.start();
+                final AtomicBoolean control = new AtomicBoolean(false);
+                dealAnimatorSet.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        disableAllButton(false);
+                        if(Hand.calculateHandValue(deck.getPlayerHand()) == 21)
+                        {
+                            Log.i("Player got BlackJack", "You Win!");
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public void disableAllButton(boolean tempControl)
+    {
+        btnDoubleDown.setEnabled(!tempControl);
+        btnSplit.setEnabled(!tempControl);
+        btnHit.setEnabled(!tempControl);
+        btnStand.setEnabled(!tempControl);
+        btnNewHand.setEnabled(!tempControl);
     }
 }

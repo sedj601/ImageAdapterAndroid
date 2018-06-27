@@ -9,6 +9,7 @@ import android.content.Context;
 import android.support.constraint.ConstraintLayout;
 import android.util.Log;
 import android.util.Pair;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -37,9 +38,6 @@ public class Deck {
         R.drawable.back_red1, R.drawable.back_red2, R.drawable.back_red3, R.drawable.back_red4, R.drawable.back_red5
     };
 
-    final private  String[] suits = {"spades", "hearts", "clubs", "diamonds"};
-    final private String[] faceValues = {"a", "2", "3", "4", "5", "6", "7", "8", "9", "10", "j", "q", "k"};
-
     int topCard;
     int dealerCardXCounter = 1;
 
@@ -57,10 +55,10 @@ public class Deck {
 
         for(int i = 0; i < cardIds.length; i++)
         {
-            System.out.println("suits: " + i/13 + "  face: " + i % 13);
-            String suit = suits[i / 13];
-            String faceValue = faceValues[i % 13];
-            cards.add(new Card(suit, faceValue, cardBackIds[0], cardIds[i], context));
+            String name = context.getResources().getResourceEntryName(cardIds[i]);
+            String tempSuit = name.split("_")[0];
+            String tempFace = name.split("_")[1];
+            cards.add(new Card(tempSuit, tempFace, cardBackIds[0], cardIds[i], context));
         }
     }
 
@@ -78,7 +76,7 @@ public class Deck {
         Collections.shuffle(cards);
     }
 
-    public boolean dealBlackJack()
+    public AnimatorSet dealBlackJack()
     {
         final Card dealerCard1 = cards.get(topCard++);
         dealerHand.add(dealerCard1);
@@ -136,23 +134,9 @@ public class Deck {
         AnimatorSet finalAnimatorSet = new AnimatorSet();
         finalAnimatorSet.playSequentially(dealerAnimatorSet1, playerAnimatorSet1, dealerAnimatorSet2, playerAnimatorSet2);
         finalAnimatorSet.setDuration(500);
-        finalAnimatorSet.start();
 
-        final AtomicBoolean control = new AtomicBoolean(false);
 
-        finalAnimatorSet.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                if(Hand.calculateHandValue(playerHand) == 21)
-                {
-                    Log.i("Player got BlackJack", "You Win!");
-                    control.set(true);
-                }
-            }
-        });
-
-        return control.get();
+        return finalAnimatorSet;
     }
 
     public int simulateDealingDealerAnotherCard()
@@ -230,6 +214,14 @@ public class Deck {
     public List<Card> getPlayerHand()
     {
         return playerHand;
+    }
+
+    public void clear()
+    {
+        for(Card tempCard : cards)
+        {
+            tempCard.getImageView().setVisibility(View.GONE);
+        }
     }
 
 

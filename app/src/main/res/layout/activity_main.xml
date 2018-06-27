@@ -11,13 +11,13 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="40dp"
-        android:layout_marginBottom="28dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="5dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginStart="5dp"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent">
@@ -61,5 +61,27 @@
             android:textSize="12sp"
             tools:layout_editor_absoluteX="16dp"
             tools:layout_editor_absoluteY="417dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginStart="5dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/btnNewHand"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="New Hand" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
