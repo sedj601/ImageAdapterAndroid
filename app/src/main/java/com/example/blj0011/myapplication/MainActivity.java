@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
         deck = new Deck(getApplicationContext());
         deck.setLocation(container, (size.x / 2), (size.y / 2 - 200));
-//        deck.shuffle();
+        deck.shuffle();
         AnimatorSet dealAnimatorSet =  deck.dealBlackJack();
         disableAllButton(true);
         dealAnimatorSet.start();
@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
                 deck.clear();
                 deck = new Deck(getApplicationContext());
                 deck.setLocation(container, (size.x / 2), (size.y / 2 - 200));
-//                deck.shuffle();
+                deck.shuffle();
                 AnimatorSet dealAnimatorSet =  deck.dealBlackJack();
                 disableAllButton(true);
                 dealAnimatorSet.start();
