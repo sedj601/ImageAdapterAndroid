@@ -6,6 +6,7 @@ import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -52,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         AnimatorSet dealAnimatorSet =  deck.dealBlackJack();
         disableAllButton(true);
         dealAnimatorSet.start();
-        final AtomicBoolean control = new AtomicBoolean(false);
         dealAnimatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -61,6 +61,11 @@ public class MainActivity extends AppCompatActivity {
                 if(Hand.calculateHandValue(deck.getPlayerHand()) == 21)
                 {
                     Log.i("Player got BlackJack", "You Win!");
+                }
+
+                if(!deck.getPlayerHand().get(0).getFace().equals(deck.getPlayerHand().get(1).getFace()))
+                {
+                    btnSplit.setEnabled(false);
                 }
             }
         });
@@ -72,7 +77,14 @@ public class MainActivity extends AppCompatActivity {
         btnDoubleDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                btnHit.performClick();
+               Handler mHandler = new Handler();
+               mHandler.postDelayed(new Runnable() {
+                    public void run() {
+                        btnStand.performClick();
+                        disableAllButton(true);
+                    }
+                }, 500);
             }
         });
 
@@ -147,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
                          @Override
                          public void onAnimationEnd(Animator animation) {
                              super.onAnimationEnd(animation);
-
+                             disableAllButton(false);
                              Log.i("Animation done", "done");
                          }
                      });
@@ -176,6 +188,11 @@ public class MainActivity extends AppCompatActivity {
                         if(Hand.calculateHandValue(deck.getPlayerHand()) == 21)
                         {
                             Log.i("Player got BlackJack", "You Win!");
+                        }
+
+                        if(!deck.getPlayerHand().get(0).getFace().equals(deck.getPlayerHand().get(1).getFace()))
+                        {
+                            btnSplit.setEnabled(false);
                         }
                     }
                 });
