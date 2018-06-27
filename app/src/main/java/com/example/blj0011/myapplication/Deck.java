@@ -132,6 +132,7 @@ public class Deck {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
+                playerCard2.getImageView().bringToFront();
                 playerCard2.showFrontImage();
             }
         });
@@ -154,7 +155,7 @@ public class Deck {
             dealerHand.getHand().add(tempDealerCard);
             this.dealerHand = dealerHand.getHand();
 
-            ObjectAnimator dealerAnimator1X = ObjectAnimator.ofFloat(tempDealerCard.getImageView(), "translationX", lastDealerCard.getImageView().getX() + 20);
+            ObjectAnimator dealerAnimator1X = ObjectAnimator.ofFloat(tempDealerCard.getImageView(), "translationX", lastDealerCard.getImageView().getX() + 40);
             ObjectAnimator dealerAnimator1Y = ObjectAnimator.ofFloat(tempDealerCard.getImageView(), "translationY", lastDealerCard.getImageView().getY());
             AnimatorSet tempDealerAnimatorSet = new AnimatorSet();
             tempDealerAnimatorSet.playTogether(dealerAnimator1X, dealerAnimator1Y);
@@ -164,6 +165,36 @@ public class Deck {
         }
 
         return null;
+
+    }
+
+    public void dealPlayerAnotherCard(Hand playerHand)
+    {
+        if(topCard < 52) {
+            Card lastDealerCard = playerHand.getHand().get(playerHand.getHand().size() - 1);
+
+            final Card tempPlayerCard = cards.get(topCard++);
+            tempPlayerCard.getImageView().bringToFront();
+            discard.add(tempPlayerCard);
+            playerHand.getHand().add(tempPlayerCard);
+            this.playerHand = playerHand.getHand();
+
+            ObjectAnimator playerAnimator1X = ObjectAnimator.ofFloat(tempPlayerCard.getImageView(), "translationX", lastDealerCard.getImageView().getX() + 40);
+            ObjectAnimator playerAnimator1Y = ObjectAnimator.ofFloat(tempPlayerCard.getImageView(), "translationY", lastDealerCard.getImageView().getY());
+
+            AnimatorSet tempPlayerAnimatorSet = new AnimatorSet();
+            tempPlayerAnimatorSet.playTogether(playerAnimator1X, playerAnimator1Y);
+
+            tempPlayerAnimatorSet.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    tempPlayerCard.showFrontImage();
+                }
+            });
+            tempPlayerAnimatorSet.start();
+        }
+
 
     }
 

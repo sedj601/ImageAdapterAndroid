@@ -19,6 +19,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -72,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
         btnHit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                player = new Hand(deck.getPlayerHand());
+                deck.dealPlayerAnotherCard(player);
 
             }
         });
@@ -85,21 +89,26 @@ public class MainActivity extends AppCompatActivity {
                 player = new Hand(deck.getPlayerHand());
 
                 AnimatorSet finalAnimatorSet = new AnimatorSet();
-                while(dealer.getValueOfCard() < 17)
+                if(dealer.getHand().contains("a") && !Collections.disjoint(dealer.getHand(), Arrays.asList("a", "10", "j", "q", "k")))
                 {
-                    finalAnimatorSet.play(deck.dealDealerAnotherCard(dealer));
-                    dealer = new Hand(deck.getDealerHand());
+                    Log.i("btnStand", "BlackJack. Dealer Wins!");
+                }
+                else {
+                    while (dealer.getValueOfCard() < 17) {
+                        finalAnimatorSet.play(deck.dealDealerAnotherCard(dealer));
+                        dealer = new Hand(deck.getDealerHand());
 
-                    Log.i("dealer hand", Integer.toString(dealer.getValueOfCard()));
-                    finalAnimatorSet.setDuration(500);
-                    finalAnimatorSet.start();
-                    finalAnimatorSet.addListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            super.onAnimationEnd(animation);
-                            dealer.getHand().get(dealer.getHand().size() - 1).showFrontImage();
-                        }
-                    });
+                        Log.i("dealer hand", Integer.toString(dealer.getValueOfCard()));
+                        finalAnimatorSet.setDuration(500);
+                        finalAnimatorSet.start();
+                        finalAnimatorSet.addListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                super.onAnimationEnd(animation);
+                                dealer.getHand().get(dealer.getHand().size() - 1).showFrontImage();
+                            }
+                        });
+                    }
                 }
 
                 if(dealer.getValueOfCard() >= 17 && dealer.getValueOfCard() <= 21)
@@ -108,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                     {
                         Log.i("Results", "Dealer Win!");
                     }
-                    else if(dealer.getValueOfCard() > player.getValueOfCard())
+                    else if(dealer.getValueOfCard() < player.getValueOfCard())
                     {
                         Log.i("Results", "You Won!");
                     }
