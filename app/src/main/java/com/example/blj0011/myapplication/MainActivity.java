@@ -19,9 +19,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     ConstraintLayout container;
 
     Deck deck;
-    Hand dealer, player;
+    //Hand dealer, player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +49,9 @@ public class MainActivity extends AppCompatActivity {
         deck.dealBlackJack();
 
         handleButtonHandlers();
-
-
-
     }
 
-    private void handleButtonHandlers()
-    {
+    private void handleButtonHandlers() {
         btnDoubleDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,56 +69,73 @@ public class MainActivity extends AppCompatActivity {
         btnHit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                player = new Hand(deck.getPlayerHand());
-                deck.dealPlayerAnotherCard(player);
-
+                AnimatorSet finalAnimatorSet = new AnimatorSet();
+                finalAnimatorSet.play(deck.dealPlayerAnotherCard());
+                finalAnimatorSet.start();
+                finalAnimatorSet.setDuration(500);
+                finalAnimatorSet.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        deck.getPlayerHand().get(deck.getPlayerHand().size() - 1).showFrontImage();
+                        Log.i("Player value", Integer.toString(Hand.calculateHandValue(deck.getPlayerHand())));
+                        if(Hand.calculateHandValue(deck.getPlayerHand()) > 21)
+                        {
+                            Log.i("You Bust!", "Dealer Wins!");
+                        }
+                        else if(Hand.calculateHandValue(deck.getPlayerHand()) ==  21)
+                        {
+                            Log.i("You got BlackJack!", "You Wins!");
+                        }
+                        //Enable buttons
+                    }
+                });
             }
         });
 
         btnStand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dealer = new Hand(deck.getDealerHand());
-                dealer.getHand().get(0).showFrontImage();
+                List<Card> tempDealerHand = deck.getDealerHand();
+                List<Card> tempPlayerHand = deck.getPlayerHand();
 
-                player = new Hand(deck.getPlayerHand());
+                tempDealerHand.get(1).showFrontImage();;
 
-                AnimatorSet finalAnimatorSet = new AnimatorSet();
-                if(dealer.getHand().contains("a") && !Collections.disjoint(dealer.getHand(), Arrays.asList("a", "10", "j", "q", "k")))
+                if(Hand.calculateHandValue(tempDealerHand) == 21)
                 {
-                    Log.i("btnStand", "BlackJack. Dealer Wins!");
+                    Log.i("Dealer BlackJack", "Dealer Won!");
                 }
-                else {
-                    while (dealer.getValueOfCard() < 17) {
-                        finalAnimatorSet.play(deck.dealDealerAnotherCard(dealer));
-                        dealer = new Hand(deck.getDealerHand());
-
-                        Log.i("dealer hand", Integer.toString(dealer.getValueOfCard()));
-                        finalAnimatorSet.setDuration(500);
-                        finalAnimatorSet.start();
-                        finalAnimatorSet.addListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                super.onAnimationEnd(animation);
-                                dealer.getHand().get(dealer.getHand().size() - 1).showFrontImage();
-                            }
-                        });
-                    }
-                }
-
-                if(dealer.getValueOfCard() >= 17 && dealer.getValueOfCard() <= 21)
+                else if(Hand.calculateHandValue(tempDealerHand) >= 17)
                 {
-                    if(dealer.getValueOfCard() > player.getValueOfCard())
-                    {
+                    if (Hand.calculateHandValue(tempDealerHand) > Hand.calculateHandValue(tempPlayerHand)) {
                         Log.i("Results", "Dealer Win!");
-                    }
-                    else if(dealer.getValueOfCard() < player.getValueOfCard())
-                    {
-                        Log.i("Results", "You Won!");
-                    }
-                    else {
+                    } else if (Hand.calculateHandValue(tempDealerHand) < Hand.calculateHandValue(tempPlayerHand)) {
+                        Log.i("Results", "You Win!");
+                    } else {
                         Log.i("Results", "Draw!");
                     }
+                }
+                else
+                {
+                    List<Animator> animators = new ArrayList<>();
+                    int counterControl = deck.simulateDealingDealerAnotherCard();
+                    Log.i("simulate value", Integer.toString(counterControl));
+                    for(int i = 0; i < counterControl; i++)
+                    {
+                        animators.add(deck.dealDealerAnotherCard());
+                    }
+                    final AnimatorSet finalAnimatorSet = new AnimatorSet();
+                     finalAnimatorSet.playSequentially(animators);
+                     finalAnimatorSet.addListener(new AnimatorListenerAdapter() {
+                         @Override
+                         public void onAnimationEnd(Animator animation) {
+                             super.onAnimationEnd(animation);
+
+                             Log.i("Animation done", "done");
+                         }
+                     });
+
+                     finalAnimatorSet.start();
                 }
             }
         });
