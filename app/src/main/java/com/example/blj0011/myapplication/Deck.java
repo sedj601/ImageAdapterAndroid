@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Deck {
     // references to our images
     final private Integer[] cardIds = {
-        R.drawable.spades_4, R.drawable.spades_a, R.drawable.spades_k, R.drawable.spades_2, R.drawable.spades_5, R.drawable.spades_6,
+        R.drawable.spades_4, R.drawable.spades_a, R.drawable.spades_k, R.drawable.spades_k, R.drawable.spades_5, R.drawable.spades_6,
         R.drawable.spades_7, R.drawable.spades_8, R.drawable.spades_9, R.drawable.spades_10, R.drawable.spades_j, R.drawable.spades_q, R.drawable.spades_3,
         R.drawable.hearts_a, R.drawable.hearts_2, R.drawable.hearts_3, R.drawable.hearts_4, R.drawable.hearts_5, R.drawable.hearts_6,
         R.drawable.hearts_7, R.drawable.hearts_8, R.drawable.hearts_9, R.drawable.hearts_10, R.drawable.hearts_j, R.drawable.hearts_q, R.drawable.hearts_k,

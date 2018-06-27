@@ -4,10 +4,12 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
@@ -18,6 +20,8 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     Button btnDoubleDown, btnSplit, btnHit, btnStand, btnNewHand;
     ConstraintLayout container;
 
+    TextView tvDealerScore, tvPlayerScore;
     Deck deck;
     Point size = new Point();
     //Hand dealer, player;
@@ -44,12 +49,15 @@ public class MainActivity extends AppCompatActivity {
         btnStand = findViewById(R.id.btnStand);
         btnNewHand = findViewById(R.id.btnNewHand);
 
+//        tvDealerScore = new TextView("");
+//        tvPlayerScore = new TextView("");
+
         Display display = getWindowManager().getDefaultDisplay();
         display.getSize(size);
 
         deck = new Deck(getApplicationContext());
         deck.setLocation(container, (size.x / 2), (size.y / 2 - 200));
-        deck.shuffle();
+        //deck.shuffle();
         AnimatorSet dealAnimatorSet =  deck.dealBlackJack();
         disableAllButton(true);
         dealAnimatorSet.start();
@@ -60,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 disableAllButton(false);
                 if(Hand.calculateHandValue(deck.getPlayerHand()) == 21)
                 {
+                    checkWin("player");
                     Log.i("Player got BlackJack", "You Win!");
                 }
 
@@ -132,23 +141,22 @@ public class MainActivity extends AppCompatActivity {
 
                 if(Hand.calculateHandValue(tempDealerHand) == 21)
                 {
-                    Log.i("Dealer BlackJack", "Dealer Won!");
+                    checkWin("dealer");
                 }
                 else if(Hand.calculateHandValue(tempDealerHand) >= 17)
                 {
                     if (Hand.calculateHandValue(tempDealerHand) > Hand.calculateHandValue(tempPlayerHand)) {
-                        Log.i("Results", "Dealer Win!");
+                        checkWin("dealer");
                     } else if (Hand.calculateHandValue(tempDealerHand) < Hand.calculateHandValue(tempPlayerHand)) {
-                        Log.i("Results", "You Win!");
+                        checkWin("player");
                     } else {
-                        Log.i("Results", "Draw!");
+                       checkWin("draw");
                     }
                 }
                 else
                 {
                     List<Animator> animators = new ArrayList<>();
                     int counterControl = deck.simulateDealingDealerAnotherCard();
-                    Log.i("simulate value", Integer.toString(counterControl));
                     for(int i = 0; i < counterControl; i++)
                     {
                         animators.add(deck.dealDealerAnotherCard());
@@ -160,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
                          public void onAnimationEnd(Animator animation) {
                              super.onAnimationEnd(animation);
                              disableAllButton(false);
-                             Log.i("Animation done", "done");
                          }
                      });
 
@@ -175,11 +182,10 @@ public class MainActivity extends AppCompatActivity {
                 deck.clear();
                 deck = new Deck(getApplicationContext());
                 deck.setLocation(container, (size.x / 2), (size.y / 2 - 200));
-                deck.shuffle();
+                //deck.shuffle();
                 AnimatorSet dealAnimatorSet =  deck.dealBlackJack();
                 disableAllButton(true);
                 dealAnimatorSet.start();
-                final AtomicBoolean control = new AtomicBoolean(false);
                 dealAnimatorSet.addListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
@@ -187,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                         disableAllButton(false);
                         if(Hand.calculateHandValue(deck.getPlayerHand()) == 21)
                         {
-                            Log.i("Player got BlackJack", "You Win!");
+                            checkWin("player blackjack");
                         }
 
                         if(!deck.getPlayerHand().get(0).getFace().equals(deck.getPlayerHand().get(1).getFace()))
@@ -207,5 +213,43 @@ public class MainActivity extends AppCompatActivity {
         btnHit.setEnabled(!tempControl);
         btnStand.setEnabled(!tempControl);
         btnNewHand.setEnabled(!tempControl);
+    }
+
+    public void disableAllButNextGame()
+    {
+        btnDoubleDown.setEnabled(false);
+        btnSplit.setEnabled(false);
+        btnHit.setEnabled(false);
+        btnStand.setEnabled(false);
+        btnNewHand.setEnabled(true);
+    }
+
+    public void checkWin(String control)
+    {
+        disableAllButNextGame();
+        switch (control)
+        {
+            case "player":
+                Toast.makeText(this, "You Won!", Toast.LENGTH_SHORT).show();
+                break;
+            case "dealer":
+                Toast.makeText(this, "You Lose!", Toast.LENGTH_SHORT).show();
+                break;
+            case "draw":
+                Toast.makeText(this, "Draw!", Toast.LENGTH_SHORT).show();
+                break;
+            case "dealer bust":
+                Toast.makeText(this, "Dealer Bust! You Won!", Toast.LENGTH_SHORT).show();
+                break;
+            case "player bust":
+                Toast.makeText(this, "You Bust! You Lose!", Toast.LENGTH_SHORT).show();
+                break;
+            case "dealer blackjack":
+                Toast.makeText(this, "Dealer BlackJack! You Lose!", Toast.LENGTH_SHORT).show();
+                break;
+            case "player blackjack":
+                Toast.makeText(this, "You Bust! You Lose!!", Toast.LENGTH_SHORT).show();
+                break;
+        }
     }
 }
