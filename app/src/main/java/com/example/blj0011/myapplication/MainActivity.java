@@ -49,15 +49,12 @@ public class MainActivity extends AppCompatActivity {
         btnStand = findViewById(R.id.btnStand);
         btnNewHand = findViewById(R.id.btnNewHand);
 
-//        tvDealerScore = new TextView("");
-//        tvPlayerScore = new TextView("");
-
         Display display = getWindowManager().getDefaultDisplay();
         display.getSize(size);
 
         deck = new Deck(getApplicationContext());
         deck.setLocation(container, (size.x / 2), (size.y / 2 - 200));
-        //deck.shuffle();
+        deck.shuffle();
         AnimatorSet dealAnimatorSet =  deck.dealBlackJack();
         disableAllButton(true);
         dealAnimatorSet.start();
@@ -91,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
                mHandler.postDelayed(new Runnable() {
                     public void run() {
                         btnStand.performClick();
-                        disableAllButton(true);
+                        disableAllButNextGame();
                     }
                 }, 500);
             }
@@ -119,11 +116,11 @@ public class MainActivity extends AppCompatActivity {
                         Log.i("Player value", Integer.toString(Hand.calculateHandValue(deck.getPlayerHand())));
                         if(Hand.calculateHandValue(deck.getPlayerHand()) > 21)
                         {
-                            Log.i("You Bust!", "Dealer Wins!");
+                            checkWin("player bust");
                         }
                         else if(Hand.calculateHandValue(deck.getPlayerHand()) ==  21)
                         {
-                            Log.i("You got BlackJack!", "You Wins!");
+                            checkWin("player blackjack");
                         }
                         //Enable buttons
                     }
@@ -167,7 +164,24 @@ public class MainActivity extends AppCompatActivity {
                          @Override
                          public void onAnimationEnd(Animator animation) {
                              super.onAnimationEnd(animation);
-                             disableAllButton(false);
+                             disableAllButNextGame();
+                             List<Card> tempDealerHand = deck.getDealerHand();
+                             List<Card> tempPlayerHand = deck.getPlayerHand();
+
+                             if(Hand.calculateHandValue(tempDealerHand) > 21)
+                             {
+                                 checkWin("dealer bust");
+                             }
+                             else
+                             {
+                                 if (Hand.calculateHandValue(tempDealerHand) > Hand.calculateHandValue(tempPlayerHand)) {
+                                     checkWin("dealer");
+                                 } else if (Hand.calculateHandValue(tempDealerHand) < Hand.calculateHandValue(tempPlayerHand)) {
+                                     checkWin("player");
+                                 } else {
+                                     checkWin("draw");
+                                 }
+                             }
                          }
                      });
 
@@ -182,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
                 deck.clear();
                 deck = new Deck(getApplicationContext());
                 deck.setLocation(container, (size.x / 2), (size.y / 2 - 200));
-                //deck.shuffle();
+                deck.shuffle();
                 AnimatorSet dealAnimatorSet =  deck.dealBlackJack();
                 disableAllButton(true);
                 dealAnimatorSet.start();
