@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
     TextView tvDealerScore, tvPlayerScore;
     Deck deck;
     Point size = new Point();
-    //Hand dealer, player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,13 +83,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 btnHit.performClick();
-               Handler mHandler = new Handler();
-               mHandler.postDelayed(new Runnable() {
-                    public void run() {
-                        btnStand.performClick();
-                        disableAllButNextGame();
-                    }
-                }, 500);
+                if(Hand.calculateHandValue(deck.getPlayerHand()) <= 21) {
+                    Handler mHandler = new Handler();
+                    mHandler.postDelayed(new Runnable() {
+                        public void run() {
+                            btnStand.performClick();
+                            disableAllButNextGame();
+                        }
+                    }, 500);
+                }
+                else{
+                    checkWin("player bust");
+                }
+
             }
         });
 
