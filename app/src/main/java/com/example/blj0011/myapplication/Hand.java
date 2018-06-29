@@ -1,6 +1,5 @@
 package com.example.blj0011.myapplication;
 
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,44 +28,37 @@ public class Hand {
 
         int value = 0;
 
-        Log.i("PLAYER VALUE card size", Integer.toString(hand.size()));
-
-
-            for (Card card : hand) {
-                Log.i("PLAYER face value", card.getFace());
-                if (staticFaceCards.contains(card.getFace())) {
-                    value += 10;
-                } else if (staticNumberCards.contains(card.getFace())) {
-                    value += Integer.parseInt(card.getFace());
-                    Log.i("PLAYER VALUE 0", Integer.toString(value));
-                }
-                if("a".equals(card.getFace()))
-                {
-                    value += 11;
-                }
+        for (Card card : hand) {
+            if (staticFaceCards.contains(card.getFace())) {
+                value += 10;
+            } else if (staticNumberCards.contains(card.getFace())) {
+                value += Integer.parseInt(card.getFace());
             }
-
-
-            if(value > 21)
+            if("a".equals(card.getFace()))
             {
-                List<String> tempString = new ArrayList<>();
-                for(Card card : hand)
-                {
-                    tempString.add(card.getFace());
-                }
+                value += 11;
+            }
+        }
 
-                int tempFrequency = Collections.frequency(tempString, "a");
-                for(int i =0; i < tempFrequency; i++)
-                {
-                    value -= 10;
-                    if(value < 21)
-                    {
-                        break;
-                    }
-                }
+        if(value > 21)
+        {
+            List<String> tempString = new ArrayList<>();
+            for(Card card : hand)
+            {
+                tempString.add(card.getFace());
             }
 
-        Log.i("PLAYER VALUE", Integer.toString(value));
+            int tempFrequency = Collections.frequency(tempString, "a");
+            for(int i =0; i < tempFrequency; i++)
+            {
+                value -= 10;
+                if(value < 21)
+                {
+                    break;
+                }
+            }
+        }
+
         return value;
     }
 
@@ -100,7 +92,7 @@ public class Hand {
                 }
             }
         }
-        Log.i("PLAYER VALUE", Integer.toString(value));
+
         return value;
     }
 

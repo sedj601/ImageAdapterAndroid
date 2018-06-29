@@ -7,17 +7,13 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.support.constraint.ConstraintLayout;
-import android.util.Log;
-import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Deck {
     // references to our images
@@ -38,13 +34,15 @@ public class Deck {
         R.drawable.back_red1, R.drawable.back_red2, R.drawable.back_red3, R.drawable.back_red4, R.drawable.back_red5
     };
 
-    int topCard;
-    int dealerCardXCounter = 1;
+    private int topCard;
+    private int dealerCardXCounter = 1;
 
-    List<Card> cards;
-    List<Card> dealerHand;
-    List<Card> playerHand;
+    private List<Card> cards;
+    private List<Card> dealerHand;
+    private List<Card> playerHand;
 
+    private TextView tvPlayerScore;
+    private TextView tvDealerScore;
 
 
     public Deck(Context context)
@@ -60,10 +58,28 @@ public class Deck {
             String tempFace = name.split("_")[1];
             cards.add(new Card(tempSuit, tempFace, cardBackIds[0], cardIds[i], context));
         }
+
+        Collections.shuffle(cards);
+
+        tvPlayerScore = new TextView(context);
+        tvDealerScore = new TextView(context);
+
+        tvPlayerScore.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        tvDealerScore.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        tvDealerScore.setText("0");
+        tvPlayerScore.setText("0");
     }
 
     public void setLocation(ConstraintLayout layout, float x, float y)
     {
+        tvPlayerScore.setX((int)x);
+        tvPlayerScore.setY((int)y);
+        layout.addView(tvPlayerScore);
+
+        tvDealerScore.setX((int)x);
+        tvDealerScore.setY((int)y);
+        layout.addView(tvDealerScore);
+
         for(Card card : cards)
         {
             card.setLocation(x, y);
@@ -71,15 +87,13 @@ public class Deck {
         }
     }
 
-    public void shuffle()
-    {
-        Collections.shuffle(cards);
-    }
-
     public AnimatorSet dealBlackJack()
     {
+        tvDealerScore.setY(tvDealerScore.getY() - 290);
+        tvPlayerScore.setY(tvPlayerScore.getY() + 510);
         final Card dealerCard1 = cards.get(topCard++);
         dealerHand.add(dealerCard1);
+        tvDealerScore.setText(Integer.toString(Hand.calculateHandValue(dealerHand)));
         ObjectAnimator dealerAnimator1X = ObjectAnimator.ofFloat(dealerCard1.getImageView(), "translationX", dealerCard1.getImageView().getX() - 20);
         ObjectAnimator dealerAnimator1Y = ObjectAnimator.ofFloat(dealerCard1.getImageView(), "translationY", dealerCard1.getImageView().getY() - 400);
         AnimatorSet dealerAnimatorSet1 = new AnimatorSet();
@@ -103,6 +117,7 @@ public class Deck {
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 playerCard1.showFrontImage();
+                tvPlayerScore.setText(Integer.toString(Hand.calculateHandValue(playerHand)));
             }
         });
 
@@ -113,6 +128,7 @@ public class Deck {
         ObjectAnimator dealerAnimator2Y = ObjectAnimator.ofFloat(dealerCard2.getImageView(), "translationY", dealerCard2.getImageView().getY() - 400);
         AnimatorSet dealerAnimatorSet2 = new AnimatorSet();
         dealerAnimatorSet2.playTogether(dealerAnimator2X, dealerAnimator2Y);
+
 
 
         final Card playerCard2 = cards.get(topCard++);
@@ -127,14 +143,13 @@ public class Deck {
                 super.onAnimationEnd(animation);
                 playerCard2.getImageView().bringToFront();
                 playerCard2.showFrontImage();
+                tvPlayerScore.setText(Integer.toString(Hand.calculateHandValue(playerHand)));
             }
         });
-
 
         AnimatorSet finalAnimatorSet = new AnimatorSet();
         finalAnimatorSet.playSequentially(dealerAnimatorSet1, playerAnimatorSet1, dealerAnimatorSet2, playerAnimatorSet2);
         finalAnimatorSet.setDuration(500);
-
 
         return finalAnimatorSet;
     }
@@ -150,7 +165,6 @@ public class Deck {
         {
             ++control;
             innerDealerHand.add(cards.get(innerTopCard++));
-            Log.i("SimulationDealer Values", Integer.toString(Hand.calculateHandValue(innerDealerHand)));
         }
 
 
@@ -171,6 +185,12 @@ public class Deck {
 
             AnimatorSet tempDealerAnimatorSet = new AnimatorSet();
             tempDealerAnimatorSet.playTogether(dealerAnimator1X, dealerAnimator1Y);
+            tempDealerAnimatorSet.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                }
+            });
 
             return tempDealerAnimatorSet;
         }
@@ -184,8 +204,7 @@ public class Deck {
 
             final Card tempDealerCard = cards.get(topCard++);
             tempDealerCard.getImageView().bringToFront();
-            dealerHand.add(tempDealerCard);
-
+            System.out.println("test: " + tempDealerCard.getFace());
             ObjectAnimator dealerAnimator1X = ObjectAnimator.ofFloat(tempDealerCard.getImageView(), "translationX", cards.get(topCard).getImageView().getX() + 20 + (dealerCardXCounter++ * 40));
             ObjectAnimator dealerAnimator1Y = ObjectAnimator.ofFloat(tempDealerCard.getImageView(), "translationY", tempDealerCard.getImageView().getY() - 400);
 
@@ -197,6 +216,7 @@ public class Deck {
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
                     tempDealerCard.showFrontImage();
+                    updateDealerScore();
                 }
             });
 
@@ -216,8 +236,21 @@ public class Deck {
         return playerHand;
     }
 
+    public void updateDealerScore()
+    {
+        tvDealerScore.setText(Integer.toString(Hand.calculateHandValue(dealerHand)));
+    }
+
+    public void updatePlayerScore()
+    {
+        tvPlayerScore.setText(Integer.toString(Hand.calculateHandValue(playerHand)));
+    }
+
     public void clear()
     {
+        tvPlayerScore.setVisibility(View.GONE);
+        tvDealerScore.setVisibility(View.GONE);
+
         for(Card tempCard : cards)
         {
             tempCard.getImageView().setVisibility(View.GONE);
